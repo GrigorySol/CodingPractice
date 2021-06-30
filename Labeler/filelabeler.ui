@@ -170,16 +170,9 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QCheckBox" name="checkBox_ISO">
+           <widget class="QCheckBox" name="checkBox_Res">
             <property name="text">
-             <string>ISO</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBox_Focal">
-            <property name="text">
-             <string>Focal Length</string>
+             <string>Resolution</string>
             </property>
            </widget>
           </item>

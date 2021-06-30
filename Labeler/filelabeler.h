@@ -22,6 +22,8 @@ private slots:
 
     void rename_files(const QStringList &files, const QStringList &settings);
 
+    void xml_reader(const QString &file_name, QString &prefix);
+
     void on_line_prefix_textEdited(const QString &arg1);
 
     void on_line_suffix_textEdited(const QString &arg1);
