@@ -153,6 +153,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QCheckBox" name="checkBox_Date">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Date</string>
             </property>
@@ -160,6 +163,9 @@
           </item>
           <item>
            <widget class="QCheckBox" name="checkBox_FPS">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>FPS</string>
             </property>
@@ -171,6 +177,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QCheckBox" name="checkBox_Res">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Resolution</string>
             </property>

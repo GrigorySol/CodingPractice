@@ -12,16 +12,23 @@ FileLabeler::FileLabeler(QWidget *parent)
     , ui(new Ui::FileLabeler)
 {
     ui->setupUi(this);
-    QString path = QDir::homePath();
-    QString date = QDate::currentDate().toString("yyyy-MM-dd");
-    ui->line_folder->setText(path);
-    ui->line_prefix->setText(date + "_");
-    ui->label_name->setText(date + "_" + "001.mp4");
+    FileLabeler::default_parameters();
 }
 
 FileLabeler::~FileLabeler()
 {
     delete ui;
+}
+
+
+void FileLabeler::default_parameters()
+{
+    QString path = QDir::homePath();
+    QString date = QDate::currentDate().toString("yyyy-MM-dd");
+    ui->line_folder->setText(path);
+    ui->line_prefix->setText(date + "_");
+    ui->line_suffix->setText("");
+    ui->label_name->setText(date + "_" + "001.mp4");
 }
 
 
@@ -35,6 +42,7 @@ void FileLabeler::on_pushButt_folder_released()
     FileLabeler::scan_folder();
 }
 
+
 void FileLabeler::scan_folder()
 {
     QDir path = ui->line_folder->text();
@@ -42,23 +50,50 @@ void FileLabeler::scan_folder()
     QStringList files = path.entryList(QStringList() << "*.mp4" << "*.MP4",QDir::Files);
     QStringList meta = path.entryList(QStringList() << "*.xml" << "*.XML",QDir::Files);
     if (meta.size()) {
+        ui->checkBox_Date->setEnabled(true);
+        ui->checkBox_FPS->setEnabled(true);
+        ui->checkBox_Res->setEnabled(true);
         settings_info = " Configuration files found.";
+    } else {
+        ui->checkBox_Date->setEnabled(false);
+        ui->checkBox_FPS->setEnabled(false);
+        ui->checkBox_Res->setEnabled(false);
+        ui->checkBox_Date->setChecked(false);
+        ui->checkBox_FPS->setChecked(false);
+        ui->checkBox_Res->setChecked(false);
     }
     if (files.size()) {
         int amount = files.count();
-        ui->statusbar->showMessage(QString::number(amount) + " files successfully found." + settings_info);
+        ui->statusbar->showMessage(QString::number(amount) + " video files found." + settings_info);
     } else {
         ui->statusbar->showMessage("Files not found. Please, select another folder.");
     }
 }
 
+
+void FileLabeler::check_checkers()
+{
+    QString prefix = ui->line_prefix->text();
+    QString suffix = ui->line_suffix->text();
+    QString date = QDate::currentDate().toString("yyyy-MM-dd_");
+    QString fps = "25p_";
+    QString resolution = "1080_";
+
+    if (ui->checkBox_Date->isChecked()) prefix += date;
+    if (ui->checkBox_FPS->isChecked()) prefix += fps;
+    if (ui->checkBox_Res->isChecked()) prefix += resolution;
+
+    ui->label_name->setText(prefix + "001" + suffix + ".mp4");
+}
+
+
 void FileLabeler::rename_files(const QStringList &files, const QStringList &meta)
 {
     int i {};
-    QString prefix = ui->line_prefix->text();
-    QString suffix = ui->line_suffix->text();
     QDir::setCurrent(ui->line_folder->text());
     for (auto &name: files) {
+        QString prefix = ui->line_prefix->text();
+        QString suffix = ui->line_suffix->text();
         QStringList current_meta {meta.filter(name.left(5))};
         if (current_meta.size()) {
             FileLabeler::xml_reader(current_meta[0], prefix);
@@ -71,6 +106,7 @@ void FileLabeler::rename_files(const QStringList &files, const QStringList &meta
     }
     ui->statusbar->showMessage(QString::number(i) + " files successfully renamed. ");
 }
+
 
 void FileLabeler::xml_reader(const QString &xml_name, QString &prefix)
 {
@@ -111,20 +147,6 @@ void FileLabeler::xml_reader(const QString &xml_name, QString &prefix)
     }
 }
 
-void FileLabeler::on_line_prefix_textEdited(const QString &arg1)
-{
-    QString suffix = ui->line_suffix->text();
-    ui->label_name->setText(arg1 + "001" + suffix + ".mp4");
-}
-
-
-void FileLabeler::on_line_suffix_textEdited(const QString &arg1)
-{
-    QString prefix = ui->line_prefix->text();
-    ui->label_name->setText(prefix + "001" + arg1 + ".mp4");
-
-}
-
 
 void FileLabeler::on_pushButt_rename_released()
 {
@@ -134,3 +156,45 @@ void FileLabeler::on_pushButt_rename_released()
     FileLabeler::rename_files(files, meta);
 }
 
+
+void FileLabeler::on_line_prefix_textEdited(const QString &arg1)
+{
+    FileLabeler::check_checkers();
+}
+
+
+void FileLabeler::on_line_suffix_textEdited(const QString &arg1)
+{
+    FileLabeler::check_checkers();
+}
+
+
+void FileLabeler::on_checkBox_Date_stateChanged(int arg1)
+{
+    FileLabeler::check_checkers();
+}
+
+
+void FileLabeler::on_checkBox_FPS_stateChanged(int arg1)
+{
+    FileLabeler::check_checkers();
+}
+
+
+void FileLabeler::on_checkBox_Res_stateChanged(int arg1)
+{
+    FileLabeler::check_checkers();
+}
+
+
+void FileLabeler::on_line_folder_textEdited(const QString &arg1)
+{
+    FileLabeler::scan_folder();
+}
+
+
+void FileLabeler::on_pushButt_reset_released()
+{
+    FileLabeler::default_parameters();
+    FileLabeler::scan_folder();
+}
