@@ -15,7 +15,16 @@ public:
     QtCalc(QWidget *parent = nullptr);
     ~QtCalc();
 
+private slots:
+    void addnumber();
+    void on_btnEquals_clicked();
+    void on_btnClear_clicked();
+
 private:
     Ui::QtCalc *ui;
+
+    QString number;
+
+    void buttons();
 };
 #endif // QTCALC_H
