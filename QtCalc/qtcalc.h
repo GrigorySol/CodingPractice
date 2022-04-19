@@ -2,6 +2,7 @@
 #define QTCALC_H
 
 #include <QWidget>
+#include <QShortcut>
 #include <QDebug>
 
 QT_BEGIN_NAMESPACE
@@ -35,10 +36,14 @@ private slots:
 
 private:
     Ui::QtCalc *ui;
-    QString number;
+    QString typing_number;
     QString sign;
+    QString lcd_line;
     double first_number{};
 
     void buttons();
+
+    void keyshortcuts();
+
 };
 #endif // QTCALC_H
