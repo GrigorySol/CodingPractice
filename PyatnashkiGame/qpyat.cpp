@@ -9,9 +9,7 @@ QPyat::QPyat(QWidget *parent)
     , ui(new Ui::QPyat)
 {
     ui->setupUi(this);
-    this->setFixedSize(QSize(440,400));
-
-    createPuzzle();
+    init();
 }
 
 QPyat::~QPyat()
@@ -19,14 +17,29 @@ QPyat::~QPyat()
     delete ui;
 }
 
+void QPyat::init()
+{
+    this->setFixedSize(QSize(460,500));
+    textFont = this->font();
+    textFont.setPointSize(24);                      // Set bigger font size
+
+    gameTable = new QFrame(this);
+    gameTable->setFixedSize(QSize(460,420));        // On my macbook I have to use this magic numbers to make tiles look square
+    gameLayout = new QGridLayout(gameTable);        // Create Layout for tiles
+    gameLayout->setSpacing(0);
+
+    createPuzzle();
+
+    btnNewGame = new QPushButton(this);
+    btnNewGame->setText("New Game");
+    btnNewGame->setFont(textFont);
+    ui->qPyatLayout->addWidget(btnNewGame, 0, Qt::AlignBottom);
+    connect(btnNewGame, &QPushButton::clicked, this, &QPyat::startNewGame);
+}
+
 void QPyat::createPuzzle()
 {
-    QGridLayout *gameTable = new QGridLayout(this); // Create Layout for tiles
-    gameTable->setSpacing(0);
-
     const QSize tileSize = QSize(100, 100);         // Set fixed size for tiles
-    QFont tileFont = this->font();
-    tileFont.setPointSize(24);                      // Set bigger font size
 
     std::vector<int> tileNames{};                   // Create shuffled vector with tile numbers
     for (int x{1}; x<17; x++) tileNames.push_back(x);
@@ -41,13 +54,13 @@ void QPyat::createPuzzle()
                 vectorIndex++;
                 continue;
             }
-            QPushButton *tile = new QPushButton(this);                         // Create tile
-            tile->setFixedSize(tileSize);                                      // Fix tile size
-            tile->setText(QString::number(tileNames[vectorIndex]));            // Set a name
-            tile->setFont(tileFont);
-            connect(tile, &QPushButton::clicked, this, &QPyat::tileMovement);   // Run movement on click
+            QPushButton *tile = new QPushButton(gameTable);                       // Create tile
+            tile->setFixedSize(tileSize);                                         // Fix tile size
+            tile->setText(QString::number(tileNames[vectorIndex]));               // Set a name
+            tile->setFont(textFont);
+            connect(tile, &QPushButton::clicked, this, &QPyat::tileMovement);     // Run movement on click
 
-            gameTable->addWidget(tile, 0+i, k);     // Add tile to the game table
+            gameLayout->addWidget(tile, 0+i, k);     // Add tile to the game table
             vectorIndex++;
         }
     }
@@ -55,18 +68,30 @@ void QPyat::createPuzzle()
 
 void QPyat::tileMovement()
 {
-    QPushButton* tile = qobject_cast<QPushButton*>(sender());
+    QPushButton* tile = qobject_cast<QPushButton*>(sender());   // Take tile pointer from qobect_cast
     if(!tile) return;
 
-    QPoint emptyPos = findEmpty(tile->pos());
-    tile->move(emptyPos.x(), emptyPos.y());
+    QPoint emptyPos = findEmpty(tile->pos());   // Check if there is an ampty tile
+    tile->move(emptyPos.x(), emptyPos.y());     // Move tile
 }
 
 QPoint QPyat::findEmpty(const QPoint &tilePos)
 {
-    if(tilePos.x()-50 > 0 && !this->childAt(tilePos.x()-50, tilePos.y()+50)) return QPoint(tilePos.x()-100, tilePos.y());
-    else if(tilePos.y()-50 > 0 && !this->childAt(tilePos.x()+50, tilePos.y()-50)) return QPoint(tilePos.x(), tilePos.y()-91);
-    else if(tilePos.x()+150 < 400 && !this->childAt(tilePos.x()+150, tilePos.y()+50)) return QPoint(tilePos.x()+100, tilePos.y());
-    else if(tilePos.y()+150 < 400 && !this->childAt(tilePos.x()+50, tilePos.y()+150)) return QPoint(tilePos.x(), tilePos.y()+91);
+    const int x {107};
+    const int y {98};
+
+    if(tilePos.x()-x > 0 && !gameTable->childAt(tilePos.x()-x, tilePos.y()+50)) return QPoint(tilePos.x()-x, tilePos.y());
+    else if(tilePos.y()-x > 0 && !gameTable->childAt(tilePos.x(), tilePos.y()-50)) return QPoint(tilePos.x(), tilePos.y()-y);
+    else if(tilePos.x()+x < 400 && !gameTable->childAt(tilePos.x()+x, tilePos.y()+50)) return QPoint(tilePos.x()+x, tilePos.y());
+    else if(tilePos.y()+x < 400 && !gameTable->childAt(tilePos.x(), tilePos.y()+101)) return QPoint(tilePos.x(), tilePos.y()+y);
     return tilePos;
+}
+
+
+void QPyat::startNewGame()
+{
+    QList<QPushButton*> tilesList = gameTable->findChildren<QPushButton*>();
+    for(auto tile: tilesList) delete tile;
+
+    createPuzzle();
 }

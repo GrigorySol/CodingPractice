@@ -2,6 +2,7 @@
 #define QPYAT_H
 
 #include <QDialog>
+#include <QFrame>
 #include <QGridLayout>
 #include <QPushButton>
 #include <QSize>
@@ -23,8 +24,15 @@ public:
 
 private slots:
     void tileMovement();
+    void startNewGame();
 private:
     Ui::QPyat *ui;
+    QFrame *gameTable;
+    QGridLayout *gameLayout;
+    QFont textFont;
+    QPushButton *btnNewGame;
+
+    void init();
     void createPuzzle();
     QPoint  findEmpty(const QPoint &tilePos);
 };
