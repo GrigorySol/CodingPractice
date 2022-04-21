@@ -45,9 +45,28 @@ void QPyat::createPuzzle()
             tile->setFixedSize(tileSize);                                      // Fix tile size
             tile->setText(QString::number(tileNames[vectorIndex]));            // Set a name
             tile->setFont(tileFont);
+            connect(tile, &QPushButton::clicked, this, &QPyat::tileMovement);   // Run movement on click
 
             gameTable->addWidget(tile, 0+i, k);     // Add tile to the game table
             vectorIndex++;
         }
     }
+}
+
+void QPyat::tileMovement()
+{
+    QPushButton* tile = qobject_cast<QPushButton*>(sender());
+    if(!tile) return;
+
+    QPoint emptyPos = findEmpty(tile->pos());
+    tile->move(emptyPos.x(), emptyPos.y());
+}
+
+QPoint QPyat::findEmpty(const QPoint &tilePos)
+{
+    if(tilePos.x()-50 > 0 && !this->childAt(tilePos.x()-50, tilePos.y()+50)) return QPoint(tilePos.x()-100, tilePos.y());
+    else if(tilePos.y()-50 > 0 && !this->childAt(tilePos.x()+50, tilePos.y()-50)) return QPoint(tilePos.x(), tilePos.y()-91);
+    else if(tilePos.x()+150 < 400 && !this->childAt(tilePos.x()+150, tilePos.y()+50)) return QPoint(tilePos.x()+100, tilePos.y());
+    else if(tilePos.y()+150 < 400 && !this->childAt(tilePos.x()+50, tilePos.y()+150)) return QPoint(tilePos.x(), tilePos.y()+91);
+    return tilePos;
 }

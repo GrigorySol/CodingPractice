@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QSize>
+#include <QPoint>
 
 #include <QDebug>
 
@@ -20,8 +21,11 @@ public:
     QPyat(QWidget *parent = nullptr);
     ~QPyat();
 
+private slots:
+    void tileMovement();
 private:
     Ui::QPyat *ui;
     void createPuzzle();
+    QPoint  findEmpty(const QPoint &tilePos);
 };
 #endif // QPYAT_H
